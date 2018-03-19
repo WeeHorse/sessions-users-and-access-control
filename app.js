@@ -1,10 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-global.mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-// Connect to db
+// we set the db global because we only want one mongoose connection and instance across the application 
+global.mongoose = require('mongoose'); 
 mongoose.connect('mongodb://localhost/session_auth_and_acl');
 mongoose.connection.on('error', (e)=>{ console.error(e); });
 mongoose.connection.once('open', ()=>{ console.info('db connected');});
@@ -15,12 +14,8 @@ const session = require('./session.js');
 // ACL
 const acl = require('./acl.js');
 
-// User
-global.User = mongoose.model('User', new Schema({
-  email: {type: String, required:true, unique:true},
-  password: {type: String, required:true},
-  roles: [String]
-}));
+// User model
+const User = require('./user-model.js');
 
 // Create an Express app
 const app = express();

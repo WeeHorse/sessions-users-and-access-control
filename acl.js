@@ -1,35 +1,4 @@
-const Schema = mongoose.Schema;
-const ACL = mongoose.model('ACL', new Schema({
-  path: {type: String, unique: true},
-  roles: [String]
-}));
-
-/*
-  ACL – Access Control List:
-
-path:    roles:         
-/admin   [admin, super]
-/login   [anonymous] 
-/logout  [user] 
-/        [*]
-/message [user]
-*/
-
-/*
-// run these for example acl
-let a = new ACL({path:'/admin', roles:['admin','super']});
-a.save();
-let a1 = new ACL({path:'/login', roles:['anonymous']});
-a1.save();
-let a2 = new ACL({path:'/logout', roles:['user']});
-a2.save();
-let a3 = new ACL({path:'/', roles:['*']});
-a3.save();
-let a4 = new ACL({path:'/messages', roles:['user']});
-a4.save();
-let a5 = new ACL({path:'/user', roles:['user']});
-a5.save();
-*/
+const ACL = require('./acl-model.js');
 
 module.exports = async function(req, res, next){
   let roles = ['*']; // everyone has the "*" (all) role

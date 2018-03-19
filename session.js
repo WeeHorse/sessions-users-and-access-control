@@ -1,8 +1,5 @@
-const Schema = mongoose.Schema;
-const Session = mongoose.model('Session', new Schema({
-  loggedIn: {type:Boolean, default:false},
-  data: Schema.Types.Mixed
-}));
+const User = require('./user-model.js');
+const Session = require('./session-model.js');
 
 async function session(req, res, next){
   if(!req.cookies.session){
