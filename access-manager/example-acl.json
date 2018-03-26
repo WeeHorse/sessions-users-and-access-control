@@ -1,0 +1,9 @@
+[
+  {"path":"/admin", "roles":[ {"role": "admin", "methods": ["ALL"]}, {"role": "super", "methods": ["ALL"]} ]},
+  {"path":"/login", "roles":[ {"role": "anonymous", "methods": ["POST"]} ]},
+  {"path":"/logout", "roles":[ {"role": "user", "methods": ["GET","POST"]} ]},
+  {"path":"/", "roles":[ {"role": "*", "methods": ["GET"]} ]},
+  {"path":"/messages", "roles":[ {"role": "user", "methods": ["GET","POST","DELETE"]} ]},
+  {"path":"/user", "roles":[ {"role": "user", "methods": ["GET"]} ]},
+  {"path":"/register", "roles":[ {"role": "anonymous", "methods": ["POST"]}, {"role": "super", "methods": ["POST"]} ]}
+]

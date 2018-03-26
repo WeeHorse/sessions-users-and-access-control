@@ -1,0 +1,31 @@
+{
+  "name": "access-manager",
+  "version": "0.1.0",
+  "description": "A one-stop solution for implementing authenticated and anonymous continuous sessions with user handling and whitelisted acl.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WeeHorse/access-manager.git"
+  },
+  "keywords": [
+    "User",
+    "Session",
+    "Authentication",
+    "Access",
+    "Control",
+    "List",
+    "ACL"
+  ],
+  "author": "Benjamin Berglund a.k.a WeeHorse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WeeHorse/access-manager/issues"
+  },
+  "homepage": "https://github.com/WeeHorse/access-manager#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.3"
+  }
+}

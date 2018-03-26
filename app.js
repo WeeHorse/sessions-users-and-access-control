@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 // we set the db global because we only want one mongoose connection and instance across the application 
 global.mongoose = require('mongoose'); 
@@ -14,7 +16,11 @@ const app = express();
 const AccessManager = require('./access-manager');
 const accessManager = new AccessManager({
   mongoose: mongoose,
-  expressApp: app
+  expressApp: app,
+  aclImport:{
+    file: '', // a valid file path, if left empty, example data will be used if import is run
+    run: process.argv.includes('--import-acl-from-json') // $ node app --import-acl-from-json
+  } 
 });
 
 // User model
@@ -25,10 +31,12 @@ app.use(bodyParser.json()) // needed to post json
 
 // Register routes
 app.get('/', (req, res)=>{
-  res.json(req.params);
+  res.json(req.method);
 });
 
 app.post('/register', async (req, res)=>{
+  // encrypt password
+  req.body.password = await bcrypt.hash(req.body.password, saltRounds);
   // create user
   let user = await new User(req.body);
   await user.save();
@@ -56,14 +64,16 @@ app.post('/login', async (req, res)=>{
   if(req.user._id){
     response = {message: 'Already logged in'};
   }else{
-    let user = await User.find({email: req.body.email, password: req.body.password});
-    if(user[0]){
-      req.session.data.userId = user[0]._id;
+    // encrypt
+    let user = await User.findOne({email: req.body.email});
+    let passwordsMatch = await bcrypt.compare(req.body.password, user.password);
+    if(user && passwordsMatch){
+      req.session.user = user._id;
       req.session.loggedIn = true;
       await req.session.save(); // save the userId and login to the session
       // below to avoid sending the password to the client
-      user[0].password = '******';
-      response = {message: 'Logged in', user: user[0]};
+      user.password = '******';
+      response = {message: 'Logged in', user: user};
     }
   } 
   res.json(response);
@@ -82,8 +92,6 @@ app.all('/logout', async (req, res)=>{ // we are supposed to do delete login, bu
 app.all('*', (req, res)=>{
   res.json({params: req.params, body: req.body}); // just return some debugging, the ACL block happens in the ACL module
 });
-
-
 
 // Start the Express app on port 3000
 app.listen(3000,()=>{

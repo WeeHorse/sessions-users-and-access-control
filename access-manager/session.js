@@ -1,4 +1,3 @@
-
 module.exports = class Session{
 
   constructor(settings){
@@ -8,9 +7,10 @@ module.exports = class Session{
   }
 
   async session(req, res, next){
+    let mySession;
     if(!req.cookies.session){
       // set a cookie for a session if it doesn't exist
-      let mySession = new this.SessionModel();
+      mySession = new this.SessionModel();
       res.cookie('session', mySession._id, {
         path: '/',
         httpOnly: true
@@ -21,23 +21,24 @@ module.exports = class Session{
     }
     else {
       // Retrieve a stored session from our cookie session id
-      let sessions = await this.SessionModel.find({_id:req.cookies.session});
-      if(sessions[0]){
-        req.session = sessions[0];
-        req.session.data = req.session.data || {};
-        // is there a userId saved on the session and are they logged in?
-        if(req.session.data.userId && req.session.loggedIn){
-          let users = await this.UserModel.find({_id: req.session.data.userId});
-          if(users[0]){
-            req.user = users[0]; // apply the user object
-          }
+      //let sessions = await this.SessionModel.find({_id:req.cookies.session});
+      mySession = await this.SessionModel.findOne({_id:req.cookies.session}).populate('user').exec();
+      if(mySession){
+        req.session = mySession;
+        // is there a user saved on the session and are they logged in?
+        if(req.session.user && req.session.loggedIn){
+          req.user = req.session.user;
+        //   let users = await this.UserModel.find({_id: req.session.data.userId});
+        //   if(users[0]){
+        //     req.user = users[0]; // apply the user object
+        //   }
         }
       }else{
         delete(req.cookies.session);
         return await this.session(req, res, next);
       }
     }
-    if(!req.user || !req.user._id){
+    if(!req.user){
       req.user = {'roles':['anonymous']}; // anonymous user
     }
     next();

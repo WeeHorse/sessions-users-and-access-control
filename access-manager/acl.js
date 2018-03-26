@@ -6,7 +6,7 @@ module.exports = class Acl{
   }
 
   async acl(req, res, next){
-    let roles = ['*']; // everyone has the "*" (all) role
+    let roles = ['*']; // everyone always has the "*" (all) role
     // pick roles from session uses
     if(req.user._id){
       roles = [...roles, ...req.user.roles]; // concat in the user roles (using spread operator)

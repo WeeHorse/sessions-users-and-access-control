@@ -7,13 +7,13 @@ mongoose.connection.once('open', ()=>{ console.info('db connected');});
 const ACL = require('./acl-model.js');
 
 let entries = [
-  new ACL({path:'/admin', roles:['admin','super']}),
-  new ACL({path:'/login', roles:['anonymous']}),
-  new ACL({path:'/logout', roles:['user']}),
-  new ACL({path:'/', roles:['*']}),
-  new ACL({path:'/messages', roles:['user']}),
-  new ACL({path:'/user', roles:['user']}),
-  new ACL({path:'/register', roles:['anonymous']})
+  new ACL({path:'/admin', roles:[ {role: 'admin', methods: ['ALL']}, {role: 'super', methods: ['ALL']} ]}),
+  new ACL({path:'/login', roles:[ {role: 'anonymous', methods: ['POST']} ]}),
+  new ACL({path:'/logout', roles:[ {role: 'user', methods: ['GET','POST']} ]}),
+  new ACL({path:'/', roles:[ {role: '*', methods: ['GET']} ]}),
+  new ACL({path:'/messages', roles:[ {role: 'user', methods: ['GET','POST','DELETE']} ]}),
+  new ACL({path:'/user', roles:[ {role: 'user', methods: ['GET']} ]}),
+  new ACL({path:'/register', roles:[ {role: 'anonymous', methods: ['POST']}, {role: 'super', methods: ['POST']} ]})
 ];
 
 // save to the db
