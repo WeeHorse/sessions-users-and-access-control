@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 
 // we set the db global because we only want one mongoose connection and instance across the application 
 global.mongoose = require('mongoose'); 
@@ -8,23 +7,21 @@ mongoose.connect('mongodb://localhost/session_auth_and_acl');
 mongoose.connection.on('error', (e)=>{ console.error(e); });
 mongoose.connection.once('open', ()=>{ console.info('db connected');});
 
-// Session
-const session = require('./session.js');
-
-// ACL
-const acl = require('./acl.js');
-
-// User model
-const User = require('./user-model.js');
-
 // Create an Express app
 const app = express();
 
+// Sessions, Users and Access control middleware
+const AccessManager = require('./access-manager');
+const accessManager = new AccessManager({
+  mongoose: mongoose,
+  expressApp: app
+});
+
+// User model
+const User = accessManager.models.user;
+
 // Register middleware
 app.use(bodyParser.json()) // needed to post json
-app.use(cookieParser()); // needed to read and set cookies
-app.use(session);
-app.use(acl);
 
 // Register routes
 app.get('/', (req, res)=>{

@@ -17,11 +17,11 @@ let entries = [
 ];
 
 // save to the db
-let c = 0;
+let i = 0;
 for(let entry of entries){
   entry.save(()=>{
-    c++;
-    if(c == entries.length){ // shutdown when we are done importing
+    i++;
+    if(i == entries.length){ // shutdown when we are done importing
       mongoose.connection.close(()=>{
         console.log('Import done, mongoose connection closed');
         process.exit(0);
