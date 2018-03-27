@@ -16,11 +16,25 @@ module.exports = class Acl{
       roles.push('anonymous');
     }
     // find ACL paths that maches roles
-    // let paths = await this.AclModel.find({roles: {$in: roles}});
-    let paths = await this.AclModel.find({'roles.role':{$in: roles}});
-    console.log('paths', paths);
-    // now, are we on a valid route or not? Reject or pass?
-    let remaining = paths.filter(p => p.path.includes(req.path));
+    // let entries = await this.AclModel.find({roles: {$in: roles}});
+    console.log('req.path', req.path, 'req.method', req.method, 'roles', roles);
+    let entries = await this.AclModel.find({ 
+      path: req.path,
+      'roles.role':{$in: roles}
+    });
+    console.log('entries', entries);
+    // now, do we have the proper method in any of our matched role(s)
+    let remaining = [];
+    for(let entry of entries){
+      let remRoles = entry.roles.filter(role => role.methods.includes(req.method));
+      if(remRoles.length > 0){
+        remaining.push(entry);
+      }
+    }
+    // let remaining = entries.filter(entry => {
+    //   entry.roles.filter(role => role.methods.includes(req.method))
+    // });
+    console.log('remaining', remaining);
     if(remaining.length > 0){
       // pass!
       next();
