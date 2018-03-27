@@ -16,7 +16,9 @@ module.exports = class Acl{
       roles.push('anonymous');
     }
     // find ACL paths that maches roles
-    let paths = await this.AclModel.find({roles: {$in: roles}});
+    // let paths = await this.AclModel.find({roles: {$in: roles}});
+    let paths = await this.AclModel.find({'roles.role':{$in: roles}});
+    console.log('paths', paths);
     // now, are we on a valid route or not? Reject or pass?
     let remaining = paths.filter(p => p.path.includes(req.path));
     if(remaining.length > 0){

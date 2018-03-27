@@ -60,20 +60,22 @@ app.get('/user', (req, res)=>{
 
 app.post('/login', async (req, res)=>{
   // create login from user
-  let response;
+  let response = {message: 'Bad credentials'}; // default
   if(req.user._id){
     response = {message: 'Already logged in'};
   }else{
     // encrypt
     let user = await User.findOne({email: req.body.email});
-    let passwordsMatch = await bcrypt.compare(req.body.password, user.password);
-    if(user && passwordsMatch){
-      req.session.user = user._id;
-      req.session.loggedIn = true;
-      await req.session.save(); // save the userId and login to the session
-      // below to avoid sending the password to the client
-      user.password = '******';
-      response = {message: 'Logged in', user: user};
+    if(user){
+      let passwordsMatch = await bcrypt.compare(req.body.password, user.password);
+      if(passwordsMatch){
+        req.session.user = user._id;
+        req.session.loggedIn = true;
+        await req.session.save(); // save the userId and login to the session
+        // below to avoid sending the password to the client
+        user.password = '******';
+        response = {message: 'Logged in', user: user};
+      }
     }
   } 
   res.json(response);
